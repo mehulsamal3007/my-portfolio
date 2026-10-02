@@ -3,7 +3,7 @@ import { useSiteContent } from '../context/useSiteContent'
 
 function About() {
   const { content } = useSiteContent()
-  const { about } = content
+  const { about, profile } = content
 
   return (
     <section id="about" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -20,20 +20,34 @@ function About() {
         </h2>
       </motion.div>
 
-      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <motion.div
+      <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-14">
+        <motion.figure
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.55, ease: 'easeOut' }}
-          className="rounded-[2rem] border border-slate-800 bg-slate-900/70 p-6 sm:p-8"
+          className="mx-auto w-full max-w-sm"
         >
-          {about.paragraphs.map((paragraph) => (
-            <p key={paragraph} className="mb-5 last:mb-0 text-base leading-8 text-slate-300">{paragraph}</p>
-          ))}
-        </motion.div>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl shadow-slate-950/30">
+            {profile.photoUrl ? (
+              <img src={profile.photoUrl} alt={`Portrait of ${profile.name}`} className="h-full w-full object-cover object-center" />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-[linear-gradient(145deg,#122b3a,#17202f_55%,#262b34)]" aria-label="Portrait placeholder">
+                <span className="font-serif text-7xl font-medium text-white/80">{profile.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2)}</span>
+              </div>
+            )}
+          </div>
+          <figcaption className="mt-3 text-center text-sm text-slate-400">{profile.name}</figcaption>
+        </motion.figure>
 
-        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+        <div>
+          <div className="space-y-5 text-base leading-8 text-slate-300">
+            {about.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {about.stats.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -47,6 +61,7 @@ function About() {
               <div className="mt-2 text-sm uppercase tracking-[0.18em] text-slate-400">{stat.label}</div>
             </motion.div>
           ))}
+          </div>
         </div>
       </div>
     </section>

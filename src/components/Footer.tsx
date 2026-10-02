@@ -1,4 +1,4 @@
-import { GithubIcon, LinkedinIcon, MailIcon } from './icons'
+import { LinkedinIcon, MailIcon } from './icons'
 import { useSiteContent } from '../context/useSiteContent'
 
 function Footer() {
@@ -14,9 +14,6 @@ function Footer() {
         </p>
 
         <div className="flex items-center gap-4">
-          <a href={contact.github} target="_blank" rel="noreferrer" aria-label="GitHub" className="transition hover:text-cyan-300">
-            <GithubIcon size={18} />
-          </a>
           <a href={contact.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="transition hover:text-cyan-300">
             <LinkedinIcon size={18} />
           </a>

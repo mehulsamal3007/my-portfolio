@@ -96,7 +96,7 @@ To turn off the demo, set `VITE_ADMIN_DEMO=false` in `.env.local` and restart Vi
 
 1. Create a Supabase project and copy `.env.example` to `.env.local`.
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`. Use the project's publishable/anon key only; never put a service-role key in a Vite environment variable.
-3. Run the SQL in `supabase/schema.sql` in the Supabase SQL Editor.
+3. Run the SQL in `supabase/schema.sql` in the Supabase SQL Editor. This creates the public-read `portfolio-assets` and `portfolio-videos` buckets; only portfolio admins can upload files.
 4. In Supabase Authentication, create the admin user and disable public sign-ups.
 5. Find that user's UUID in Authentication > Users, then run this in the SQL Editor, replacing the placeholder:
 
@@ -109,3 +109,5 @@ To turn off the demo, set `VITE_ADMIN_DEMO=false` in `.env.local` and restart Vi
 7. Visit `/admin`, sign in with the created admin account, edit sections, and publish.
 
 The content table is publicly readable so visitors can render the portfolio. Row-level security only permits accounts explicitly listed in `portfolio_admins` to insert or update it. Admin membership must only be changed from the Supabase SQL Editor.
+
+The profile photo is uploaded from `/admin` and appears on the portfolio, the introduction avatar, and resume downloads. The introduction greeting and message are editable in the Admin dashboard; the popup appears on the first visit in each browser tab and can be reopened from the avatar. The optional Video Introduction section has its own Admin enable switch and accepts MP4/WebM files up to 100 MB; the section stays hidden unless enabled and a video is uploaded. Run the SQL schema again after pulling storage changes. PDF and Word resume files are generated from the currently published portfolio content, so publish Admin edits before downloading an updated copy.

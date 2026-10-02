@@ -24,17 +24,19 @@ export type ProjectItem = {
   title: string
   description: string
   technologies: string[]
+  status: string
   githubUrl: string
   projectUrl: string
   accent: string
 }
 
 export const profile = {
-  name: 'Mehul',
-  title: 'QA Automation Engineer',
+  name: 'Mehul Samal',
+  title: 'Software Test Automation Engineer',
+  photoUrl: '',
   intro:
     'Building reliable, scalable and maintainable test automation solutions that help teams ship with confidence.',
-  availability: 'Open to new opportunities',
+  availability: 'Bangalore, Karnataka',
 }
 
 export const navItems: NavItem[] = [
@@ -42,171 +44,193 @@ export const navItems: NavItem[] = [
   { label: 'About', href: '#about' },
   { label: 'Skills', href: '#skills' },
   { label: 'Experience', href: '#experience' },
-  { label: 'Projects', href: '#projects' },
+  { label: 'Demo Projects', href: '#demo-projects' },
   { label: 'Contact', href: '#contact' },
 ]
 
 export const heroBadges = [
   'Playwright',
+  'Selenium WebDriver',
   'TypeScript',
-  'Selenium',
   'Java',
-  'API Testing',
+  'Cucumber BDD',
 ]
 
 export const aboutStats = [
-  { value: '~6', label: 'Years Experience' },
-  { value: 'Automation', label: 'Primary Focus' },
-  { value: 'Web + API', label: 'Testing' },
+  { value: '6+', label: 'Years Experience' },
+  { value: '30% to 95%', label: 'Automation Pass Rate' },
+  { value: 'Java + TypeScript', label: 'Automation Languages' },
 ]
 
 export const skills: SkillGroup[] = [
   {
     title: 'AUTOMATION',
-    items: ['Playwright', 'Selenium', 'TestNG', 'Cucumber BDD'],
+    items: ['Selenium WebDriver', 'Playwright', 'Micro Focus UFT'],
   },
   {
     title: 'LANGUAGES',
     items: ['TypeScript', 'Java'],
   },
   {
-    title: 'API TESTING',
-    items: ['REST API', 'RestAssured', 'Postman'],
+    title: 'FRAMEWORKS',
+    items: ['Cucumber BDD', 'LAT'],
   },
   {
-    title: 'TESTING',
+    title: 'DATABASE',
+    items: ['JDBC', 'MySQL'],
+  },
+  {
+    title: 'TEST MANAGEMENT',
+    items: ['HP ALM', 'Jira', 'Zephyr'],
+  },
+  {
+    title: 'VERSION CONTROL',
+    items: ['GitHub', 'Bitbucket'],
+  },
+  {
+    title: 'DEVELOPMENT TOOLS',
+    items: ['GitHub Copilot', 'IntelliJ IDEA', 'Eclipse', 'VS Code'],
+  },
+  {
+    title: 'TESTING EXPERTISE',
     items: [
-      'Manual Testing',
       'Functional Testing',
       'Regression Testing',
       'Test Planning',
-      'Defect Management',
+      'Defect Tracking',
+      'Automation Framework Design & Maintenance',
     ],
   },
   {
-    title: 'TOOLS',
-    items: ['Git', 'GitHub', 'GitHub Copilot'],
+    title: 'OPERATING SYSTEMS',
+    items: ['Windows', 'macOS', 'iOS', 'Android'],
   },
 ]
 
 export const experience: ExperienceItem[] = [
   {
-    company: '[COMPANY NAME]',
-    role: 'QA Automation Engineer',
-    period: '[START DATE] — [END DATE / PRESENT]',
+    company: 'Infosys',
+    role: 'Quality Engineering Analyst',
+    period: 'June 2024 — Present',
     responsibilities: [
-      'Developed and maintained automated test suites.',
-      'Worked with Playwright and Selenium to improve validation coverage.',
-      'Created reusable automation components and test utilities.',
-      'Performed functional and regression testing across critical flows.',
-      'Worked on API testing for backend validation and contract checks.',
-      'Participated in test planning and release-readiness reviews.',
-      'Reported and managed defects through the QA lifecycle.',
-      'Collaborated with QA and development teams to improve product quality.',
+      'Designed and executed automated e-commerce test scripts using Selenium WebDriver, Java, and Cucumber.',
+      'Migrated a legacy Selenium/Java framework to Playwright/TypeScript to improve scalability and execution speed.',
+      'Built Playwright test cases with GitHub Copilot to accelerate automation development.',
+      'Added network logging, traces, and video capture for failed tests to improve debugging and root-cause analysis.',
+      'Centralized test inputs outside feature files and automated regression prerequisite checks.',
+      'Performed manual testing for non-automatable scenarios, reviewed test coverage, and tracked defects.',
     ],
   },
   {
-    company: '[COMPANY NAME]',
-    role: 'QA Engineer',
-    period: '[START DATE] — [END DATE]',
+    company: 'Capgemini Technology Services India Limited',
+    role: 'Consultant',
+    period: 'July 2020 — June 2024',
     responsibilities: [
-      'Executed manual and automated testing for web applications.',
-      'Validated business-critical user journeys and regression scenarios.',
-      'Contributed to defect reporting, triage, and tracking.',
-      'Supported end-to-end quality validation across UI and API layers.',
-      'Helped maintain a consistent testing mindset across the release process.',
+      'Developed and maintained Selenium WebDriver automation using Java for web applications.',
+      'Redesigned automation frameworks to improve maintainability and execution efficiency.',
+      'Improved the automation passing rate from 30% to 95% with JDBC-based data handling.',
+      'Executed functional and regression testing, and tracked defects in HP ALM.',
+      'Prepared test plans, estimates, and daily and weekly status reports.',
+      'Led and mentored QA team members on automation practices and coding standards.',
+      'Worked with business and development teams across requirements, testing, defect management, and Waterfall releases.',
     ],
   },
 ]
 
 export const automationPipeline: PipelineStep[] = [
   {
-    title: 'Requirement Review',
-    description: 'Translate scope into validation goals and risk areas.',
+    title: 'Framework Migration',
+    description: 'Moved legacy Selenium/Java automation to Playwright/TypeScript.',
   },
   {
-    title: 'Test Design',
-    description: 'Build robust scenarios that cover real user behavior.',
+    title: 'Test Development',
+    description: 'Built automated web tests with Selenium, Java, and Cucumber.',
   },
   {
-    title: 'Automation',
-    description: 'Create maintainable flows with scalable test architecture.',
+    title: 'Test Data',
+    description: 'Centralized test inputs and used JDBC-based data handling.',
   },
   {
-    title: 'Execution',
-    description: 'Run checks with consistent environments and fail-fast feedback.',
+    title: 'Regression',
+    description: 'Automated prerequisite checks for smoother regression runs.',
   },
   {
-    title: 'Reporting',
-    description: 'Communicate outcomes clearly and track quality signals.',
+    title: 'Failure Analysis',
+    description: 'Captured network logs, traces, and video for failed tests.',
   },
   {
-    title: 'Defect Analysis',
-    description: 'Investigate failures to uncover root causes and prevent recurrence.',
+    title: 'Defect Tracking',
+    description: 'Documented and tracked defects to support timely resolution.',
   },
   {
-    title: 'Continuous Improvement',
-    description: 'Refine coverage and execution quality over time.',
+    title: 'Team Delivery',
+    description: 'Collaborated across QA, business, and development teams.',
   },
 ]
 
 export const projects: ProjectItem[] = [
   {
-    title: 'Playwright Automation Framework',
+    title: 'Playwright E2E Framework',
     description:
-      'End-to-end automation framework designed for scalable and maintainable web application testing.',
-    technologies: ['Playwright', 'TypeScript', 'BDD', 'Git'],
-    githubUrl: '#',
-    projectUrl: '#',
+      'A planned sample framework for maintainable browser tests, reusable fixtures, parallel execution, and clear failure diagnostics.',
+    technologies: ['Playwright', 'TypeScript', 'Fixtures', 'Trace Viewer'],
+    status: 'Planned demo',
+    githubUrl: '',
+    projectUrl: '',
     accent: 'from-cyan-500/20 to-sky-500/5',
   },
   {
-    title: 'Selenium Automation Framework',
+    title: 'Selenium + Cucumber BDD',
     description:
-      'Web automation framework focused on reusable page objects, test execution and maintainability.',
-    technologies: ['Selenium', 'Java', 'TestNG', 'POM'],
-    githubUrl: '#',
-    projectUrl: '#',
+      'A planned Java demo showing readable Gherkin scenarios, reusable step definitions, and a page-object approach.',
+    technologies: ['Selenium WebDriver', 'Java', 'Cucumber BDD'],
+    status: 'Planned demo',
+    githubUrl: '',
+    projectUrl: '',
     accent: 'from-indigo-500/20 to-blue-500/5',
   },
   {
-    title: 'API Automation',
+    title: 'API Testing Collection',
     description:
-      'Automated API validation covering functional scenarios and response verification.',
-    technologies: ['REST API', 'RestAssured', 'Postman'],
-    githubUrl: '#',
-    projectUrl: '#',
+      'A planned API testing demo covering organized requests, positive and negative cases, and response validation.',
+    technologies: ['REST API', 'Postman', 'Assertions'],
+    status: 'Planned demo',
+    githubUrl: '',
+    projectUrl: '',
     accent: 'from-emerald-500/20 to-cyan-500/5',
   },
   {
-    title: 'Test Automation Strategy',
+    title: 'Test Data and Regression Strategy',
     description:
-      'Structured approach to designing maintainable automation coverage across functional and regression scenarios.',
-    technologies: ['Automation', 'Regression', 'BDD', 'API Testing'],
-    githubUrl: '#',
-    projectUrl: '#',
+      'A planned example of data-driven test design, regression selection, and setup checks for repeatable runs.',
+    technologies: ['Test Strategy', 'Test Data', 'Regression'],
+    status: 'Planned demo',
+    githubUrl: '',
+    projectUrl: '',
     accent: 'from-violet-500/20 to-sky-500/5',
   },
 ]
 
 export const techMarquee = [
   'PLAYWRIGHT',
-  'TYPESCRIPT',
-  'SELENIUM',
+  'SELENIUM WEBDRIVER',
   'JAVA',
-  'TESTNG',
-  'CUCUMBER',
-  'REST ASSURED',
-  'POSTMAN',
-  'GIT',
-  'GITHUB',
+  'TYPESCRIPT',
+  'CUCUMBER BDD',
+  'MICRO FOCUS UFT',
+  'JDBC',
+  'MYSQL',
+  'JIRA',
+  'ZEPHYR',
+  'HP ALM',
+  'BITBUCKET',
 ]
 
 export const contactLinks = {
-  email: 'YOUR_EMAIL',
-  phone: 'YOUR_PHONE_NUMBER',
-  linkedin: 'YOUR_LINKEDIN_URL',
-  github: 'YOUR_GITHUB_URL',
+  email: 'mehul.samal0797@gmail.com',
+  phone: '7021609322',
+  linkedin: 'https://www.linkedin.com/in/mehul-samal-539474117/',
+  github: '',
 }
 
 export const siteContent = {
@@ -214,9 +238,7 @@ export const siteContent = {
   navItems,
   hero: {
     badges: heroBadges,
-    projectButtonLabel: 'View My Work',
-    resumeButtonLabel: 'Download Resume',
-    resumeUrl: '/Mehul-Resume.pdf',
+    projectButtonLabel: 'Demo Projects',
     connectLabel: 'Let’s Connect',
     qualityLabel: 'Quality Focus',
     qualityTitle: 'Reliable by design',
@@ -231,23 +253,35 @@ export const siteContent = {
       { label: 'Regression', value: 95 },
     ],
   },
+  welcomePopup: {
+    enabled: true,
+    greeting: 'Hi, I’m Mehul!',
+    introduction: 'Welcome to my portfolio. I’m a QA Automation Engineer with 6+ years of experience building reliable test automation across e-commerce and media & entertainment. Explore my experience and demo projects to learn more about my work and approach.',
+  },
+  videoIntroduction: {
+    enabled: false,
+    title: 'Video Introduction',
+    caption: 'A short introduction from me.',
+    videoUrl: '',
+  },
   about: {
     eyebrow: 'About Me',
-    heading: 'Quality-first engineering with a testing mindset.',
+    heading: 'Automation engineering focused on reliable releases.',
     paragraphs: [
-      'I’m a QA Automation Engineer with approximately 6 years of experience building dependable test automation for web and API workflows. My work focuses on creating maintainable automation frameworks using Playwright, Selenium, TypeScript, Java, and API testing tools that help teams release with greater confidence.',
-      'I’ve worked across functional testing, regression validation, defect management, and test planning while supporting both manual and automated quality initiatives. My experience spans e-commerce and mass & media domains, where reliability, traceability, and delivery confidence are critical.',
+      'I am a QA Automation Engineer with 6+ years of experience in automation and manual testing across e-commerce and media & entertainment. My work includes Selenium WebDriver with Java, Playwright with TypeScript, Cucumber BDD, automation framework development, and regression testing.',
+      'I have migrated legacy automation frameworks, optimized test data handling, and improved debugging with network logs, traces, and video capture. At Capgemini, JDBC-based data handling helped improve the automation passing rate from 30% to 95%.',
+      'I hold a B.E. in Computer Engineering from Saraswati College of Engineering (2015–2019). My contributions have been recognized with an Innovation Award and a Delivery Excellence Award, along with promotions from Senior Analyst to Associate Consultant and Consultant.',
     ],
     stats: aboutStats,
   },
   skillsSection: {
     eyebrow: 'Skills',
-    heading: 'Tools and practices for dependable quality delivery.',
+    heading: 'Tools and practices used across test automation and quality engineering.',
     groups: skills,
   },
   experienceSection: {
     eyebrow: 'Experience',
-    heading: 'Practical experience across quality engineering and automation.',
+    heading: 'Quality engineering experience at Infosys and Capgemini.',
     items: experience,
   },
   automationSection: {
@@ -256,25 +290,21 @@ export const siteContent = {
     steps: automationPipeline,
   },
   projectsSection: {
-    eyebrow: 'Projects',
-    heading: 'A few representative automation initiatives.',
+    eyebrow: 'Demo Projects',
+    heading: 'Planned demos to showcase my testing approach and technical skills.',
+    intro: 'These personal showcase concepts are separate from the professional work listed in Experience. I’ll add project links as I build them.',
     items: projects,
     githubButtonLabel: 'GitHub',
     projectButtonLabel: 'View Project',
   },
   terminal: {
-    title: 'QA Automation Terminal',
+    title: 'Automation Delivery Highlights',
     lines: [
-      '$ npm run test',
-      'Initializing test suite…',
-      '✓ Login test',
-      '✓ Search test',
-      '✓ Product validation',
-      '✓ Checkout test',
-      '✓ API validation',
-      'Tests: 42',
-      'Passed: 42',
-      'Failed: 0',
+      'Selenium / Java to Playwright / TypeScript migration',
+      'Network logs, traces, and video for failed tests',
+      'Centralized test inputs outside feature files',
+      'Automated regression prerequisite checks',
+      'Automation passing rate improved from 30% to 95%',
     ],
   },
   techMarquee,

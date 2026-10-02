@@ -70,3 +70,65 @@ drop trigger if exists set_portfolio_content_updated_at on public.portfolio_cont
 create trigger set_portfolio_content_updated_at
   before update on public.portfolio_content
   for each row execute function public.set_portfolio_content_updated_at();
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'portfolio-assets',
+  'portfolio-assets',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp']::text[]
+)
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Public can view portfolio assets" on storage.objects;
+create policy "Public can view portfolio assets"
+  on storage.objects for select
+  to public
+  using (bucket_id = 'portfolio-assets');
+
+drop policy if exists "Portfolio admins can upload assets" on storage.objects;
+create policy "Portfolio admins can upload assets"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'portfolio-assets'
+    and exists (
+      select 1 from public.portfolio_admins
+      where user_id = (select auth.uid())
+    )
+  );
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'portfolio-videos',
+  'portfolio-videos',
+  true,
+  104857600,
+  array['video/mp4', 'video/webm']::text[]
+)
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Public can view portfolio videos" on storage.objects;
+create policy "Public can view portfolio videos"
+  on storage.objects for select
+  to public
+  using (bucket_id = 'portfolio-videos');
+
+drop policy if exists "Portfolio admins can upload videos" on storage.objects;
+create policy "Portfolio admins can upload videos"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'portfolio-videos'
+    and exists (
+      select 1 from public.portfolio_admins
+      where user_id = (select auth.uid())
+    )
+  );

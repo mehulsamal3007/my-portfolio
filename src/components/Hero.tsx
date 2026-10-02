@@ -1,10 +1,42 @@
 import { motion } from 'framer-motion'
-import { ArrowRightIcon, DownloadIcon, SparklesIcon } from './icons'
+import { useEffect, useRef, useState } from 'react'
+import { FileText } from 'lucide-react'
+import { ArrowRightIcon, CloseIcon, DownloadIcon, SparklesIcon } from './icons'
 import { useSiteContent } from '../context/useSiteContent'
+import { downloadResumePdf, downloadResumeWord } from '../lib/resume-downloads'
 
 function Hero() {
   const { content } = useSiteContent()
   const { profile, hero } = content
+  const [downloadError, setDownloadError] = useState('')
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false)
+  const resumeButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!isResumeModalOpen) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsResumeModalOpen(false)
+        requestAnimationFrame(() => resumeButtonRef.current?.focus())
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isResumeModalOpen])
+
+  const handleResumeDownload = async (format: 'pdf' | 'word') => {
+    setDownloadError('')
+    try {
+      if (format === 'pdf') await downloadResumePdf(content)
+      else await downloadResumeWord(content)
+      setIsResumeModalOpen(false)
+      requestAnimationFrame(() => resumeButtonRef.current?.focus())
+    } catch {
+      setDownloadError('Could not generate the resume. Please try again.')
+    }
+  }
 
   return (
     <section id="home" className="relative overflow-hidden pt-28 sm:pt-32">
@@ -75,21 +107,24 @@ function Hero() {
             className="flex flex-col gap-4 sm:flex-row"
           >
             <a
-              href="#projects"
+              href="#demo-projects"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
             >
               {hero.projectButtonLabel}
               <ArrowRightIcon size={16} />
             </a>
-            <a
-              href={hero.resumeUrl}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              ref={resumeButtonRef}
+              onClick={() => {
+                setDownloadError('')
+                setIsResumeModalOpen(true)
+              }}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:border-cyan-400/60 hover:text-cyan-300"
             >
               <DownloadIcon size={16} />
-              {hero.resumeButtonLabel}
-            </a>
+              Download Resume
+            </button>
           </motion.div>
 
           <motion.div
@@ -163,6 +198,84 @@ function Hero() {
           </div>
         </motion.div>
       </div>
+
+      {isResumeModalOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/75 px-4 py-8 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsResumeModalOpen(false)
+              requestAnimationFrame(() => resumeButtonRef.current?.focus())
+            }
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="resume-dialog-title"
+            aria-describedby="resume-dialog-description"
+            className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl shadow-black/50"
+          >
+            <div className="flex items-start justify-between border-b border-slate-800 px-6 py-5 sm:px-7">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-cyan-300">Resume download</p>
+                <h2 id="resume-dialog-title" className="mt-2 text-xl font-semibold text-white">Choose a format</h2>
+                <p id="resume-dialog-description" className="mt-1 text-sm leading-6 text-slate-400">
+                  Download the latest published version of {profile.name}’s resume.
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close resume format dialog"
+                onClick={() => {
+                  setIsResumeModalOpen(false)
+                  requestAnimationFrame(() => resumeButtonRef.current?.focus())
+                }}
+                className="ml-4 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-700 text-slate-300 transition hover:border-slate-500 hover:text-white"
+              >
+                <CloseIcon size={16} />
+              </button>
+            </div>
+
+            <div className="grid gap-3 p-5 sm:grid-cols-2 sm:p-6">
+              <button
+                type="button"
+                autoFocus
+                onClick={() => void handleResumeDownload('pdf')}
+                className="group flex min-h-24 items-center gap-4 rounded-xl border border-slate-700 bg-slate-900/70 p-4 text-left transition hover:border-cyan-400/60 hover:bg-cyan-400/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
+              >
+                <span className="relative flex h-14 w-12 shrink-0 items-center justify-center rounded-lg border border-rose-300/20 bg-gradient-to-b from-rose-400/15 to-rose-950/40 text-rose-200 shadow-inner shadow-rose-300/5">
+                  <FileText size={31} strokeWidth={1.4} aria-hidden="true" />
+                  <span className="absolute bottom-1 rounded bg-rose-500 px-1 text-[8px] font-bold leading-3 text-white">PDF</span>
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-white">PDF document</span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-400">Ready to view or print</span>
+                </span>
+                <DownloadIcon size={16} className="shrink-0 text-slate-400 transition group-hover:text-cyan-300" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => void handleResumeDownload('word')}
+                className="group flex min-h-24 items-center gap-4 rounded-xl border border-slate-700 bg-slate-900/70 p-4 text-left transition hover:border-cyan-400/60 hover:bg-cyan-400/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
+              >
+                <span className="relative flex h-14 w-12 shrink-0 items-center justify-center rounded-lg border border-sky-300/20 bg-gradient-to-b from-sky-400/15 to-blue-950/40 text-sky-200 shadow-inner shadow-sky-300/5">
+                  <FileText size={31} strokeWidth={1.4} aria-hidden="true" />
+                  <span className="absolute bottom-1 rounded bg-blue-600 px-1 text-[8px] font-bold leading-3 text-white">W</span>
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-white">Word document</span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-400">Editable Microsoft Word file</span>
+                </span>
+                <DownloadIcon size={16} className="shrink-0 text-slate-400 transition group-hover:text-cyan-300" />
+              </button>
+            </div>
+
+            {downloadError && <p role="alert" className="px-6 pb-5 text-sm text-rose-300">{downloadError}</p>}
+          </section>
+        </div>
+      )}
     </section>
   )
 }

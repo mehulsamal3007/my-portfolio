@@ -4,6 +4,8 @@ import Contact from './components/Contact'
 import Experience from './components/Experience'
 import Footer from './components/Footer'
 import Hero from './components/Hero'
+import IntroductionAvatar from './components/IntroductionAvatar'
+import VideoIntroduction from './components/VideoIntroduction'
 import Navbar from './components/Navbar'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
@@ -31,6 +33,7 @@ function AppContent() {
 
       <main>
         <Hero />
+        <VideoIntroduction />
         <About />
         <Skills />
         <Experience />
@@ -42,6 +45,7 @@ function AppContent() {
       </main>
 
       <Footer />
+      <IntroductionAvatar />
     </div>
   )
 }

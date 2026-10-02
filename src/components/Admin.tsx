@@ -47,14 +47,98 @@ function FieldEditor({
   value,
   path,
   onChange,
+  onUploadPhoto,
+  onUploadVideo,
 }: {
   label: string
   value: unknown
   path: ContentPath
   onChange: (path: ContentPath, value: unknown) => void
+  onUploadPhoto: (file: File) => Promise<void>
+  onUploadVideo: (file: File) => Promise<void>
 }) {
   const controlClass = 'mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-400'
   const readableLabel = label.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (letter) => letter.toUpperCase())
+
+  if (path[0] === 'profile' && path[1] === 'photoUrl') {
+    return (
+      <div className="max-w-md">
+        <p className="text-sm font-medium text-slate-300">Profile photo</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">Upload a JPG, PNG, or WebP portrait (max 5 MB). It will appear on the portfolio and in resume downloads.</p>
+        {typeof value === 'string' && value && <img src={value} alt="Current profile portrait" className="mt-4 aspect-[4/5] w-48 rounded-xl border border-slate-700 object-cover" />}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <label className="inline-flex cursor-pointer items-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+            Upload photo
+            <input
+              className="sr-only"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0]
+                if (file) void onUploadPhoto(file)
+                event.currentTarget.value = ''
+              }}
+            />
+          </label>
+          {typeof value === 'string' && value && (
+            <button type="button" onClick={() => onChange(path, '')} className="rounded-lg border border-slate-700 px-4 py-2.5 text-sm text-slate-300 transition hover:border-slate-500">
+              Remove photo
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (path[0] === 'videoIntroduction' && path[1] === 'videoUrl') {
+    return (
+      <div className="max-w-2xl">
+        <p className="text-sm font-medium text-slate-300">Video file</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">Upload an MP4 or WebM video up to 100 MB. Publish changes after the upload completes.</p>
+        {typeof value === 'string' && value && (
+          <video className="mt-4 aspect-video w-full max-w-xl rounded-xl border border-slate-700 bg-black" src={value} controls playsInline preload="metadata" />
+        )}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <label className="inline-flex cursor-pointer items-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+            Upload video
+            <input
+              className="sr-only"
+              type="file"
+              accept="video/mp4,video/webm"
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0]
+                if (file) void onUploadVideo(file)
+                event.currentTarget.value = ''
+              }}
+            />
+          </label>
+          {typeof value === 'string' && value && (
+            <button type="button" onClick={() => onChange(path, '')} className="rounded-lg border border-slate-700 px-4 py-2.5 text-sm text-slate-300 transition hover:border-slate-500">
+              Remove video
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (typeof value === 'boolean') {
+    return (
+      <div className="flex max-w-md items-center justify-between gap-5 rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3">
+        <span className="text-sm font-medium text-slate-200">{readableLabel}</span>
+        <button
+          type="button"
+          role="switch"
+          aria-label={readableLabel}
+          aria-checked={value}
+          onClick={() => onChange(path, !value)}
+          className={`relative h-6 w-11 shrink-0 rounded-full transition ${value ? 'bg-cyan-400' : 'bg-slate-700'}`}
+        >
+          <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+        </button>
+      </div>
+    )
+  }
 
   if (typeof value === 'string' || typeof value === 'number') {
     const isLongText = typeof value === 'string' && (value.length > 90 || value.includes('\n'))
@@ -96,7 +180,7 @@ function FieldEditor({
                   onChange={(event) => onChange([...path, index], event.target.value)}
                 />
               ) : (
-                <FieldEditor label={`${readableLabel} ${index + 1}`} value={item} path={[...path, index]} onChange={onChange} />
+                <FieldEditor label={`${readableLabel} ${index + 1}`} value={item} path={[...path, index]} onChange={onChange} onUploadPhoto={onUploadPhoto} onUploadVideo={onUploadVideo} />
               )}
             </div>
             <button
@@ -127,7 +211,7 @@ function FieldEditor({
       <fieldset className={isTopObject ? 'space-y-4' : 'grid gap-4 rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:grid-cols-2'}>
         {!isTopObject && <legend className="px-1 text-sm font-semibold text-slate-100">{readableLabel}</legend>}
         {entries.map(([key, item]) => (
-          <FieldEditor key={key} label={key} value={item} path={[...path, key]} onChange={onChange} />
+          <FieldEditor key={key} label={key} value={item} path={[...path, key]} onChange={onChange} onUploadPhoto={onUploadPhoto} onUploadVideo={onUploadVideo} />
         ))}
       </fieldset>
     )
@@ -145,6 +229,7 @@ function Admin() {
   const [password, setPassword] = useState(isDemo ? demoCredentials.password : '')
   const [status, setStatus] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
 
   useEffect(() => {
     if (isAdminDemoMode) return
@@ -214,6 +299,101 @@ function Admin() {
     }
   }
 
+  const uploadProfilePhoto = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setStatus('Choose an image file.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setStatus('The photo must be 5 MB or smaller.')
+      return
+    }
+
+    setIsUploadingPhoto(true)
+    setStatus('Preparing photo…')
+    try {
+      const bitmap = await createImageBitmap(file)
+      const scale = Math.min(1, 900 / Math.max(bitmap.width, bitmap.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(bitmap.width * scale)
+      canvas.height = Math.round(bitmap.height * scale)
+      const context = canvas.getContext('2d')
+      if (!context) throw new Error('Could not prepare the photo.')
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+      bitmap.close()
+      const photoBlob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Could not prepare the photo.')), 'image/jpeg', 0.86)
+      })
+
+      if (isDemo) {
+        if (photoBlob.size > 900_000) throw new Error('For local demo mode, use a smaller photo (under 900 KB).')
+        const photoUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(String(reader.result))
+          reader.onerror = () => reject(new Error('Could not read the photo.'))
+          reader.readAsDataURL(photoBlob)
+        })
+        setDraft((current) => updateAtPath(current ?? content, ['profile', 'photoUrl'], photoUrl))
+        setStatus('Photo added to the draft. Publish changes to save it in this browser.')
+        return
+      }
+
+      if (!client) throw new Error('Supabase is not configured.')
+      const objectPath = `portraits/${crypto.randomUUID()}.jpg`
+      const { error } = await client.storage.from('portfolio-assets').upload(objectPath, photoBlob, { contentType: 'image/jpeg' })
+      if (error) throw error
+      const { data } = client.storage.from('portfolio-assets').getPublicUrl(objectPath)
+      const photoUrl = `${data.publicUrl}?v=${Date.now()}`
+      setDraft((current) => updateAtPath(current ?? content, ['profile', 'photoUrl'], photoUrl))
+      setStatus('Photo uploaded to the draft. Publish changes to show it on the portfolio.')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not upload the photo.')
+    } finally {
+      setIsUploadingPhoto(false)
+    }
+  }
+
+  const uploadIntroductionVideo = async (file: File) => {
+    if (!['video/mp4', 'video/webm'].includes(file.type)) {
+      setStatus('Choose an MP4 or WebM video.')
+      return
+    }
+    if (file.size > 100 * 1024 * 1024) {
+      setStatus('The video must be 100 MB or smaller.')
+      return
+    }
+
+    setIsUploadingPhoto(true)
+    setStatus('Uploading video…')
+    try {
+      if (isDemo) {
+        if (file.size > 3 * 1024 * 1024) throw new Error('Local demo videos must be 3 MB or smaller. Configure Supabase to upload larger videos.')
+        const videoUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(String(reader.result))
+          reader.onerror = () => reject(new Error('Could not read the video.'))
+          reader.readAsDataURL(file)
+        })
+        setDraft((current) => updateAtPath(current ?? content, ['videoIntroduction', 'videoUrl'], videoUrl))
+        setStatus('Video added to the draft. Publish changes to save it in this browser.')
+        return
+      }
+
+      if (!client) throw new Error('Supabase is not configured.')
+      const extension = file.type === 'video/webm' ? 'webm' : 'mp4'
+      const objectPath = `introductions/${crypto.randomUUID()}.${extension}`
+      const { error } = await client.storage.from('portfolio-videos').upload(objectPath, file, { contentType: file.type })
+      if (error) throw error
+      const { data } = client.storage.from('portfolio-videos').getPublicUrl(objectPath)
+      setDraft((current) => updateAtPath(current ?? content, ['videoIntroduction', 'videoUrl'], `${data.publicUrl}?v=${Date.now()}`))
+      setStatus('Video uploaded to the draft. Publish changes to show it on the portfolio.')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not upload the video.')
+    } finally {
+      setIsUploadingPhoto(false)
+    }
+  }
+
   const panel = (children: ReactNode) => (
     <div className="min-h-screen text-slate-100">
       <header className="border-b border-slate-800 bg-slate-950/80">
@@ -277,11 +457,11 @@ function Admin() {
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => setDraft(content)} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-slate-500">Reset draft</button>
-            <button type="button" disabled={isSaving || isLoading} onClick={() => void publish()} className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Publishing…' : 'Publish changes'}</button>
+            <button type="button" disabled={isSaving || isLoading || isUploadingPhoto} onClick={() => void publish()} className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Publishing…' : 'Publish changes'}</button>
           </div>
         </div>
         {isLoading && <p className="mb-4 text-sm text-slate-400">Loading published content…</p>}
-        <FieldEditor label={String(activeSection)} value={(draft ?? content)[activeSection]} path={[String(activeSection)]} onChange={(path, value) => setDraft((current) => updateAtPath(current ?? content, path, value))} />
+        <FieldEditor label={String(activeSection)} value={(draft ?? content)[activeSection]} path={[String(activeSection)]} onChange={(path, value) => setDraft((current) => updateAtPath(current ?? content, path, value))} onUploadPhoto={uploadProfilePhoto} onUploadVideo={uploadIntroductionVideo} />
         <div aria-live="polite" className="mt-6 min-h-6 text-sm text-cyan-200">{status || (updatedAt ? `Last published ${new Date(updatedAt).toLocaleString()}` : '')}</div>
       </section>
     </main>,
