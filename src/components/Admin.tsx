@@ -49,6 +49,8 @@ function FieldEditor({
   onChange,
   onUploadPhoto,
   onUploadVideo,
+  uploadStatus,
+  isUploading,
 }: {
   label: string
   value: unknown
@@ -56,6 +58,8 @@ function FieldEditor({
   onChange: (path: ContentPath, value: unknown) => void
   onUploadPhoto: (file: File) => Promise<void>
   onUploadVideo: (file: File) => Promise<void>
+  uploadStatus: string
+  isUploading: boolean
 }) {
   const controlClass = 'mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-400'
   const readableLabel = label.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (letter) => letter.toUpperCase())
@@ -67,12 +71,13 @@ function FieldEditor({
         <p className="mt-1 text-xs leading-5 text-slate-500">Upload a JPG, PNG, or WebP portrait (max 5 MB). It will appear on the portfolio and in resume downloads.</p>
         {typeof value === 'string' && value && <img src={value} alt="Current profile portrait" className="mt-4 aspect-[4/5] w-48 rounded-xl border border-slate-700 object-cover" />}
         <div className="mt-4 flex flex-wrap gap-2">
-          <label className="inline-flex cursor-pointer items-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
-            Upload photo
+          <label className={`inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-semibold transition ${isUploading ? 'cursor-wait bg-slate-700 text-slate-300' : 'cursor-pointer bg-cyan-400 text-slate-950 hover:bg-cyan-300'}`}>
+            {isUploading ? 'Uploading photo…' : 'Upload photo'}
             <input
               className="sr-only"
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              disabled={isUploading}
               onChange={(event) => {
                 const file = event.currentTarget.files?.[0]
                 if (file) void onUploadPhoto(file)
@@ -86,6 +91,11 @@ function FieldEditor({
             </button>
           )}
         </div>
+        {uploadStatus && (
+          <p role="status" aria-live="polite" className={`mt-3 rounded-lg border px-3 py-2 text-xs leading-5 ${uploadStatus.startsWith('Photo uploaded') ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200' : uploadStatus.startsWith('Upload failed') ? 'border-rose-400/30 bg-rose-400/10 text-rose-200' : 'border-cyan-400/20 bg-cyan-400/5 text-cyan-100'}`}>
+            {uploadStatus}
+          </p>
+        )}
       </div>
     )
   }
@@ -180,7 +190,7 @@ function FieldEditor({
                   onChange={(event) => onChange([...path, index], event.target.value)}
                 />
               ) : (
-                <FieldEditor label={`${readableLabel} ${index + 1}`} value={item} path={[...path, index]} onChange={onChange} onUploadPhoto={onUploadPhoto} onUploadVideo={onUploadVideo} />
+                <FieldEditor label={`${readableLabel} ${index + 1}`} value={item} path={[...path, index]} onChange={onChange} onUploadPhoto={onUploadPhoto} onUploadVideo={onUploadVideo} uploadStatus={uploadStatus} isUploading={isUploading} />
               )}
             </div>
             <button
@@ -211,7 +221,7 @@ function FieldEditor({
       <fieldset className={isTopObject ? 'space-y-4' : 'grid gap-4 rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:grid-cols-2'}>
         {!isTopObject && <legend className="px-1 text-sm font-semibold text-slate-100">{readableLabel}</legend>}
         {entries.map(([key, item]) => (
-          <FieldEditor key={key} label={key} value={item} path={[...path, key]} onChange={onChange} onUploadPhoto={onUploadPhoto} onUploadVideo={onUploadVideo} />
+          <FieldEditor key={key} label={key} value={item} path={[...path, key]} onChange={onChange} onUploadPhoto={onUploadPhoto} onUploadVideo={onUploadVideo} uploadStatus={uploadStatus} isUploading={isUploading} />
         ))}
       </fieldset>
     )
@@ -228,6 +238,7 @@ function Admin() {
   const [email, setEmail] = useState(isDemo ? demoCredentials.email : '')
   const [password, setPassword] = useState(isDemo ? demoCredentials.password : '')
   const [status, setStatus] = useState('')
+  const [photoUploadStatus, setPhotoUploadStatus] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
 
@@ -292,6 +303,9 @@ function Admin() {
     try {
       await saveContent(draft ?? content)
       setStatus(isDemo ? 'Saved in this browser only. These changes are not published to visitors.' : 'Published. Visitors will see these updates when they load the site.')
+      if (photoUploadStatus.startsWith('Photo uploaded')) {
+        setPhotoUploadStatus(isDemo ? 'Photo saved in this browser.' : 'Photo published and visible on your site.')
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Could not publish changes.')
     } finally {
@@ -300,17 +314,17 @@ function Admin() {
   }
 
   const uploadProfilePhoto = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setStatus('Choose an image file.')
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setPhotoUploadStatus('Upload failed: choose a JPG, PNG, or WebP image.')
       return
     }
     if (file.size > 5 * 1024 * 1024) {
-      setStatus('The photo must be 5 MB or smaller.')
+      setPhotoUploadStatus('Upload failed: the photo must be 5 MB or smaller.')
       return
     }
 
     setIsUploadingPhoto(true)
-    setStatus('Preparing photo…')
+    setPhotoUploadStatus('Preparing photo…')
     try {
       const bitmap = await createImageBitmap(file)
       const scale = Math.min(1, 900 / Math.max(bitmap.width, bitmap.height))
@@ -318,7 +332,7 @@ function Admin() {
       canvas.width = Math.round(bitmap.width * scale)
       canvas.height = Math.round(bitmap.height * scale)
       const context = canvas.getContext('2d')
-      if (!context) throw new Error('Could not prepare the photo.')
+      if (!context) throw new Error('Could not prepare the photo in this browser.')
       context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
       bitmap.close()
       const photoBlob = await new Promise<Blob>((resolve, reject) => {
@@ -334,20 +348,29 @@ function Admin() {
           reader.readAsDataURL(photoBlob)
         })
         setDraft((current) => updateAtPath(current ?? content, ['profile', 'photoUrl'], photoUrl))
-        setStatus('Photo added to the draft. Publish changes to save it in this browser.')
+        setPhotoUploadStatus('Photo added to the draft. Click Publish changes to save it.')
         return
       }
 
       if (!client) throw new Error('Supabase is not configured.')
       const objectPath = `portraits/${crypto.randomUUID()}.jpg`
       const { error } = await client.storage.from('portfolio-assets').upload(objectPath, photoBlob, { contentType: 'image/jpeg' })
-      if (error) throw error
+      if (error) {
+        const message = error.message.toLowerCase()
+        if (message.includes('bucket not found')) {
+          throw new Error('The portfolio-assets bucket is missing. Run the latest supabase/schema.sql in Supabase SQL Editor, then try again.')
+        }
+        if (message.includes('row-level security') || message.includes('not authorized') || message.includes('unauthorized')) {
+          throw new Error('Supabase rejected this upload. Confirm this login is listed in public.portfolio_admins and rerun the latest supabase/schema.sql.')
+        }
+        throw error
+      }
       const { data } = client.storage.from('portfolio-assets').getPublicUrl(objectPath)
       const photoUrl = `${data.publicUrl}?v=${Date.now()}`
       setDraft((current) => updateAtPath(current ?? content, ['profile', 'photoUrl'], photoUrl))
-      setStatus('Photo uploaded to the draft. Publish changes to show it on the portfolio.')
+      setPhotoUploadStatus('Photo uploaded. Click Publish changes to show it on the portfolio.')
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Could not upload the photo.')
+      setPhotoUploadStatus(`Upload failed: ${error instanceof Error ? error.message : 'Could not upload the photo.'}`)
     } finally {
       setIsUploadingPhoto(false)
     }
@@ -460,9 +483,14 @@ function Admin() {
             <button type="button" disabled={isSaving || isLoading || isUploadingPhoto} onClick={() => void publish()} className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Publishing…' : 'Publish changes'}</button>
           </div>
         </div>
+        {status && (
+          <div role="status" aria-live="polite" className={`mb-5 rounded-lg border px-4 py-3 text-sm ${status.startsWith('Could not') || status.includes('failed') ? 'border-rose-400/30 bg-rose-400/10 text-rose-200' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-100'}`}>
+            {status}
+          </div>
+        )}
         {isLoading && <p className="mb-4 text-sm text-slate-400">Loading published content…</p>}
-        <FieldEditor label={String(activeSection)} value={(draft ?? content)[activeSection]} path={[String(activeSection)]} onChange={(path, value) => setDraft((current) => updateAtPath(current ?? content, path, value))} onUploadPhoto={uploadProfilePhoto} onUploadVideo={uploadIntroductionVideo} />
-        <div aria-live="polite" className="mt-6 min-h-6 text-sm text-cyan-200">{status || (updatedAt ? `Last published ${new Date(updatedAt).toLocaleString()}` : '')}</div>
+        <FieldEditor label={String(activeSection)} value={(draft ?? content)[activeSection]} path={[String(activeSection)]} onChange={(path, value) => setDraft((current) => updateAtPath(current ?? content, path, value))} onUploadPhoto={uploadProfilePhoto} onUploadVideo={uploadIntroductionVideo} uploadStatus={photoUploadStatus} isUploading={isUploadingPhoto} />
+        {!status && updatedAt && <div className="mt-6 text-sm text-slate-400">Last published {new Date(updatedAt).toLocaleString()}</div>}
       </section>
     </main>,
   )
